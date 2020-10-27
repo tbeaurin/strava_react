@@ -1,11 +1,14 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withStyles, Theme } from '@material-ui/core/styles';
+import { constants } from 'buffer';
 import cover from '../Resources/Images/cover.jpg';
 import connectLight2x from '../Resources/Images/connect_light@2x.png';
 import connectLight from '../Resources/Images/connect_light.png';
 import connect2x from '../Resources/Images/connect@2x.png';
 import connect from '../Resources/Images/connect.png';
 import Constants from '../Resources/Constants/Constants';
+import post from '../Services/api';
+import NetworkUrls from '../Services/NetworkUrls';
 
 const styles = (theme: Theme) => ({
   background: {
@@ -29,7 +32,7 @@ const styles = (theme: Theme) => ({
     },
   },
   connectImage: {
-    position: 'absolute' as 'absolute',
+    position: 'absolute' as const,
     cursor: 'pointer',
     transitionDuration: '250ms',
     transitionProperty: 'opacity',
@@ -43,38 +46,57 @@ type Props = {
     connectImage: string;
     connectLink: string;
   };
-  theme: Theme
+  theme: Theme,
+  location: Location
 }
 
-type State = {
-  isHover: boolean;
-}
+const LoginScene = ({ classes, theme, location }: Props): JSX.Element => {
 
-class AppScene extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      isHover: false,
-    };
+  const [isHover, setIsHover] = useState(false);
+  const [isAuthentificated, setIsAuthentificated] = useState(false);
+  const [checkedAuth, setCheckedAuth] = useState(false);
+
+  const postOauth = async () => {
+    const code = new URLSearchParams(location.search).get('code');
+    if (code) {
+      const path = `${NetworkUrls.postOauthCode  }?client_id=${Constants.clientId}&code=${code}&client_secret=${Constants.clientSecret}`;
+      const response = await post({ path });
+      if (response.access_token) {
+        localStorage.setItem('access_token', response.access_token);
+        setIsAuthentificated(true);
+      }
+    }
+    setCheckedAuth(true);
+  } 
+
+  const checkConnection = async (): Promise<void> => {
+    const storedToken = localStorage.getItem('access_token');
+    if (storedToken && storedToken !== undefined) {
+      setIsAuthentificated(true);
+      setCheckedAuth(true);
+    } else { 
+      postOauth();
+    }
   }
 
-  toggleImage = () => {
-    const { isHover } = this.state;
-    this.setState({ isHover: !isHover });
-  }
+  useEffect(() => {
+    checkConnection();
+  }, [])
 
-  render() {
-    const { classes, theme } = this.props;
+  const toggleImage = (): void => {
+    setIsHover(!isHover);
+  };
+
+  const renderAuthPage = (): JSX.Element => {
     const breakpoints = theme.breakpoints.values;
-    const { isHover } = this.state;
 
     return (
       <div className={classes.background}>
         <a
           className={classes.connectLink}
-          href={`${Constants.apiOAuth}?client_id=${Constants.clientId}&redirect_uri=${Constants.redirectUri}&response_type=${Constants.responseType}&scope=${Constants.scope}`}
-          onMouseEnter={this.toggleImage}
-          onMouseLeave={this.toggleImage}
+          href={`${NetworkUrls.getOauthCode}?client_id=${Constants.clientId}&redirect_uri=${Constants.redirectUri}&response_type=${Constants.responseType}&scope=${Constants.scope}`}
+          onMouseEnter={toggleImage}
+          onMouseLeave={toggleImage}
         >
           <img
             className={[classes.connectImage, classes.connectLink].join(' ')}
@@ -93,7 +115,12 @@ class AppScene extends Component<Props, State> {
         </a>
       </div>
     );
-  }
+  };
+
+  return (
+    checkedAuth ?
+      !isAuthentificated ? renderAuthPage() : <>Page accueil connecté</> : <>CA CHARGE</>
+  );
 }
 
-export default withStyles(styles, { withTheme: true })(AppScene);
+export default withStyles(styles, { withTheme: true })(LoginScene);

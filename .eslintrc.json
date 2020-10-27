@@ -1,37 +1,39 @@
 {
     "env": {
-        "browser": true,
-        "es2021": true
+      "node": true,
+      "jest": true,
+      "es2021": true
     },
     "extends": [
         "plugin:react/recommended",
-        "eslint:recommended",
-        "airbnb"
-    ],
-    "overrides": [
-      {
-        "files": ["*.tsx"],
-        "rules": {
-          "react/jsx-filename-extension": 0
-        }
-      }
+        "airbnb",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended",
+        "prettier/@typescript-eslint"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
+      "project": "./tsconfig.json",
         "ecmaFeatures": {
-            "jsx": true
+            "jsx": true,
+            "tsx": true
         },
         "ecmaVersion": 12,
-        "sourceType": "module"
+        "sourceType": "module",
+        "extraFileExtensions": [".ts", ".tsx", "js"]
     },
     "plugins": [
         "react",
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "prettier"
     ],
     "rules": {
       "no-use-before-define": 0,
       "@typescript-eslint/no-use-before-define": 1,
-      "import/extensions": 0
+      "import/extensions": 0,
+      "prettier/prettier": ["off"],
+      "react/jsx-filename-extension": "off",
+      "no-nested-ternary": "off"
     },
     "settings": {
       "import/resolver": {
