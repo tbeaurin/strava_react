@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable no-unused-expressions */
+import React, { useContext, useEffect, useState } from 'react';
 import { withStyles, Theme } from '@material-ui/core/styles';
-import { constants } from 'buffer';
+import { Redirect } from 'react-router-dom';
 import cover from '../Resources/Images/cover.jpg';
 import connectLight2x from '../Resources/Images/connect_light@2x.png';
 import connectLight from '../Resources/Images/connect_light.png';
 import connect2x from '../Resources/Images/connect@2x.png';
 import connect from '../Resources/Images/connect.png';
 import Constants from '../Resources/Constants/Constants';
-import post from '../Services/api';
+import { post } from '../Services/api';
 import NetworkUrls from '../Services/NetworkUrls';
+import { AuthContext } from '../Store/AuthContext';
+import Routes from '../Resources/Routes/Routes';
 
 const styles = (theme: Theme) => ({
   background: {
@@ -46,81 +49,89 @@ type Props = {
     connectImage: string;
     connectLink: string;
   };
-  theme: Theme,
-  location: Location
-}
+  theme: Theme;
+  location: Location;
+};
 
-const LoginScene = ({ classes, theme, location }: Props): JSX.Element => {
-
+const LoginScene = ({
+  classes,
+  theme,
+  location,
+}: Props): JSX.Element => {
   const [isHover, setIsHover] = useState(false);
-  const [isAuthentificated, setIsAuthentificated] = useState(false);
-  const [checkedAuth, setCheckedAuth] = useState(false);
+  const [redirect, setRedirect] = useState('');
+  const {
+    isAuthenticated,
+    setAuthLoading,
+    setIsAuthenticated,
+    setAthlete,
+  } = useContext(AuthContext);
 
-  const postOauth = async () => {
-    const code = new URLSearchParams(location.search).get('code');
-    if (code) {
-      const path = `${NetworkUrls.postOauthCode  }?client_id=${Constants.clientId}&code=${code}&client_secret=${Constants.clientSecret}`;
-      const response = await post({ path });
-      if (response.access_token) {
-        localStorage.setItem('access_token', response.access_token);
-        setIsAuthentificated(true);
-      }
+  const postOauth = async (code: string) => {
+    const path = `${NetworkUrls.postOauthCode}?client_id=${Constants.clientId}&code=${code}&client_secret=${Constants.clientSecret}`;
+    const oauthResponse = await post({ path });
+    if (oauthResponse.access_token) {
+      localStorage.setItem(
+        'access_token',
+        oauthResponse.access_token
+      );
+      setIsAuthenticated(true);
+      setAthlete(oauthResponse.athlete);
     }
-    setCheckedAuth(true);
-  } 
+    setAuthLoading(false);
+    setRedirect(Routes.homeScene);
+  };
 
   const checkConnection = async (): Promise<void> => {
-    const storedToken = localStorage.getItem('access_token');
-    if (storedToken && storedToken !== undefined) {
-      setIsAuthentificated(true);
-      setCheckedAuth(true);
-    } else { 
-      postOauth();
+    const code = new URLSearchParams(location.search).get('code');
+    if (!isAuthenticated && code) {
+      postOauth(code);
     }
-  }
+  };
 
   useEffect(() => {
     checkConnection();
-  }, [])
+  }, []);
 
   const toggleImage = (): void => {
     setIsHover(!isHover);
   };
 
-  const renderAuthPage = (): JSX.Element => {
-    const breakpoints = theme.breakpoints.values;
+  const breakpoints = theme.breakpoints.values;
 
-    return (
-      <div className={classes.background}>
-        <a
-          className={classes.connectLink}
-          href={`${NetworkUrls.getOauthCode}?client_id=${Constants.clientId}&redirect_uri=${Constants.redirectUri}&response_type=${Constants.responseType}&scope=${Constants.scope}`}
-          onMouseEnter={toggleImage}
-          onMouseLeave={toggleImage}
-        >
-          <img
-            className={[classes.connectImage, classes.connectLink].join(' ')}
-            style={{ opacity: isHover ? 0 : 1 }}
-            src={connectLight2x}
-            srcSet={`${connectLight} ${breakpoints.sm}w , ${connectLight2x} ${breakpoints.lg}w`}
-            alt="connect with Strava"
-          />
-          <img
-            className={[classes.connectImage, classes.connectLink].join(' ')}
-            style={{ opacity: isHover ? 1 : 0 }}
-            src={connect2x}
-            srcSet={`${connect} ${breakpoints.sm}w , ${connect2x} ${breakpoints.lg}w`}
-            alt="connect with Strava"
-          />
-        </a>
-      </div>
-    );
-  };
-
-  return (
-    checkedAuth ?
-      !isAuthentificated ? renderAuthPage() : <>Page accueil connecté</> : <>CA CHARGE</>
+  return redirect && redirect !== '' ? (
+    <Redirect to={{ pathname: redirect }} />
+  ) : (
+    <div className={classes.background}>
+      <a
+        className={classes.connectLink}
+        href={`${NetworkUrls.getOauthCode}?client_id=${Constants.clientId}&redirect_uri=${Constants.redirectUri}&response_type=${Constants.responseType}&scope=${Constants.scope}`}
+        onMouseEnter={toggleImage}
+        onMouseLeave={toggleImage}>
+        <img
+          className={[classes.connectImage, classes.connectLink].join(
+            ' '
+          )}
+          style={{ opacity: isHover ? 0 : 1 }}
+          src={connectLight2x}
+          srcSet={`${connectLight} ${breakpoints.sm}w , ${connectLight2x} ${breakpoints.lg}w`}
+          alt="connect with Strava"
+        />
+        <img
+          className={[classes.connectImage, classes.connectLink].join(
+            ' '
+          )}
+          style={{ opacity: isHover ? 1 : 0 }}
+          src={connect2x}
+          srcSet={`${connect} ${breakpoints.sm}w , ${connect2x} ${breakpoints.lg}w`}
+          alt="connect with Strava"
+        />
+      </a>
+    </div>
   );
-}
+};
 
-export default withStyles(styles, { withTheme: true })(LoginScene);
+export default withStyles(styles, {
+  withTheme: true,
+  withRouter: true,
+})(LoginScene);
