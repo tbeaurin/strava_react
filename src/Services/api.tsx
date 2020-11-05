@@ -1,7 +1,4 @@
-import _ from 'lodash/fp';
 import {
-    // ErrorData,
-    // ErrorResponse,
     PostData
 } from '../Models/api';
 
@@ -39,8 +36,21 @@ interface BodyContentInterface {
     throw error;
   }
 
-  export default async function post (data: PostData): Promise<any> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export async function post (data: PostData): Promise<any> {
     const request = new Request(data.path, {method: 'POST', body: data.body});  
+    return fetch(request)
+    .then((response) => {
+        return handleCommonError(response);
+    })
+    .catch((err) => {
+        return err
+    });
+  };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export async function get (data: PostData): Promise<any> {
+    const request = new Request(data.path, {method: 'GET', body: data.body});  
     return fetch(request)
     .then((response) => {
         return handleCommonError(response);

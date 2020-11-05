@@ -1,3 +1,7 @@
 export default class Routes {
-    static routeLogin = '';
+  static loginScene = '/';
+
+  static homeScene = '/calendar';
+
+  static loadingScene = '/loading';
 }

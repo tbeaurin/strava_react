@@ -3,13 +3,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
 import { createMuiTheme } from '@material-ui/core/styles';
-import {
-  BrowserRouter as Router
-} from "react-router-dom";
 import orange from '@material-ui/core/colors/orange';
 import green from '@material-ui/core/colors/green';
+import { AuthProvider } from './Store/AuthContext';
 import RouterComponent from './Components/Router/RouterComponent';
-import LoginScene from './Ui/LoginScene';
 
 const theme = createMuiTheme({
   palette: {
@@ -21,10 +18,10 @@ const theme = createMuiTheme({
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <Router>
+      <AuthProvider>
         <RouterComponent />
-      </Router>
+      </AuthProvider>
     </ThemeProvider>
   </React.StrictMode>,
-  document.getElementById('root'),
+  document.getElementById('root')
 );
