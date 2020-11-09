@@ -1,0 +1,67 @@
+/* SURCHARGE */
+.fc-scrollgrid .fc-scrollgrid-liquid {
+  border-top: 0px solid !important;
+  border-bottom: 0px solid !important;
+  border-right: 0px solid !important;
+  border-left: 0px solid !important;
+}
+.fc-theme-standard .fc-divider,
+.fc-theme-standard .fc-popover,
+.fc-theme-standard .fc-row,
+.fc-theme-standard tbody,
+.fc-theme-standard td,
+.fc-theme-standard th,
+.fc-theme-standard thead {
+  border: 0px solid transparent;
+  border-bottom: 1px solid;
+}
+.fc .fc-cell-shaded,
+.fc .fc-day-disabled {
+  background-color: #212121;
+}
+.fc-theme-standard .fc-scrollgrid {
+  border-width: 0 !important;
+  border-style: none;
+  border: 0px solid transparent !important;
+}
+.fc-theme-standard .fc-popover {
+  border-width: 0 !important;
+  border-style: none;
+  border: 0px solid transparent !important;
+}
+.fc-button,
+.fc-button-primary {
+  box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 5px 0px rgba(0, 0, 0, 0.12) !important;
+  outline: 0;
+  position: relative;
+  align-items: center;
+  -moz-appearance: none;
+  justify-content: center;
+  text-decoration: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  color: #e0e0e0 !important;
+  background-color: #e65100 !important;
+  padding: 6px 16px !important;
+  font-size: 0.875rem !important;
+  min-width: 64px !important;
+  box-sizing: border-box !important;
+  transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms !important;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
+  font-weight: 500 !important;
+  line-height: 1.75 !important;
+  border-radius: 4px !important;
+  letter-spacing: 0.02857em !important;
+  text-transform: uppercase !important;
+}
+.fc-button:hover,
+.fc-button-primary:hover {
+  background-color: #fb8c00 !important;
+  box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 10px 0px rgba(0, 0, 0, 0.12) !important;
+}
