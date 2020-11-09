@@ -10,7 +10,7 @@ import connect from '../Resources/Images/connect.png';
 import Constants from '../Resources/Constants/Constants';
 import { post } from '../Services/api';
 import NetworkUrls from '../Services/NetworkUrls';
-import { AuthContext } from '../Store/AuthContext';
+import { AuthContext, setTokens } from '../Store/AuthContext';
 import Routes from '../Resources/Routes/Routes';
 
 const styles = (theme: Theme) => ({
@@ -60,6 +60,7 @@ const LoginScene = ({
 }: Props): JSX.Element => {
   const [isHover, setIsHover] = useState(false);
   const [redirect, setRedirect] = useState('');
+  const [code, setCode] = useState('');
   const {
     isAuthenticated,
     setAuthLoading,
@@ -67,14 +68,11 @@ const LoginScene = ({
     setAthlete,
   } = useContext(AuthContext);
 
-  const postOauth = async (code: string) => {
+  const postOauth = async (): Promise<void> => {
     const path = `${NetworkUrls.postOauthCode}?client_id=${Constants.clientId}&code=${code}&client_secret=${Constants.clientSecret}`;
     const oauthResponse = await post({ path });
     if (oauthResponse.access_token) {
-      localStorage.setItem(
-        'access_token',
-        oauthResponse.access_token
-      );
+      setTokens(oauthResponse);
       setIsAuthenticated(true);
       setAthlete(oauthResponse.athlete);
     }
@@ -83,15 +81,19 @@ const LoginScene = ({
   };
 
   const checkConnection = async (): Promise<void> => {
-    const code = new URLSearchParams(location.search).get('code');
-    if (!isAuthenticated && code) {
-      postOauth(code);
+    const newCode = new URLSearchParams(location.search).get('code');
+    if (!isAuthenticated && newCode) {
+      setCode(newCode);
     }
   };
 
   useEffect(() => {
     checkConnection();
   }, []);
+
+  useEffect(() => {
+    code && postOauth();
+  }, [code]);
 
   const toggleImage = (): void => {
     setIsHover(!isHover);

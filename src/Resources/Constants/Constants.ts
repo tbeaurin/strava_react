@@ -8,6 +8,28 @@ const responseType = 'code';
 const scope = 'activity:read_all';
 const grantType = 'authorization_code';
 
+const typeColor = {
+  Run: '#003f00', // dark green
+  Ride: '#e65100', // dark orange (theme color)
+  Swim: '#000081', // dark blue
+  Other: '#4d1265', // dark purple
+};
+
+const monthNames = [
+  'Janvier',
+  'Février',
+  'Mars',
+  'Avril',
+  'Mai',
+  'Juin',
+  'Juillet',
+  'Août',
+  'Septembre',
+  'Octobre',
+  'Novembre',
+  'Décembre',
+];
+
 export default {
   apiOAuth,
   api,
@@ -17,4 +39,6 @@ export default {
   responseType,
   scope,
   grantType,
+  typeColor,
+  monthNames,
 };
